@@ -510,7 +510,7 @@ mod tests {
         let a2 = out.iter().find(|a| a.assignee_id == 2).cloned().unwrap();
         let a3 = out.iter().find(|a| a.assignee_id == 3).cloned().unwrap();
         assert_eq!(a2.qty, 30);
-        assert_eq!(a3.qty, 40.min(20));
+        assert_eq!(a3.qty, 20);
         // Cash: 50 × 1000 intrinsic.
         let cash: i128 = out.iter().map(|a| a.cash_value_raw).sum();
         assert_eq!(cash, 50 * 1000);

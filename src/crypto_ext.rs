@@ -278,7 +278,7 @@ pub fn evaluate_batch(batch: &SettlementBatch, balances: &dyn CustodyAdapter) ->
         if *qty < 0 {
             let need = (*qty).unsigned_abs();
             match balances.balance(account, asset) {
-                Some(bal) if bal.raw as u128 >= need as u128 => {}
+                Some(bal) if bal.raw as u128 >= need => {}
                 _ => return BatchVerdict::RejectInsufficient,
             }
         }
@@ -388,6 +388,10 @@ pub fn margin_transfer_request(t: &CryptoMarginTransfer) -> CustodyRequest {
         }
     }
 }
+
+// Test-local alias to keep the idempotency assertion readable.
+#[cfg(test)]
+use CustodyOutcome as CustVerdict;
 
 #[cfg(test)]
 mod tests {
@@ -618,7 +622,3 @@ mod tests {
         }
     }
 }
-
-// Test-local alias to keep the idempotency assertion readable.
-#[cfg(test)]
-use CustodyOutcome as CustVerdict;

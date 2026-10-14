@@ -162,13 +162,12 @@ async fn service_roles_exist_non_bypass() {
         "exchange8_surveillance_service",
     ];
     for role in expected {
-        let row: Option<(bool, bool)> = sqlx::query_as(
-            "SELECT rolsuper, rolbypassrls FROM pg_roles WHERE rolname = $1",
-        )
-        .bind(role)
-        .fetch_optional(&mut *conn)
-        .await
-        .unwrap();
+        let row: Option<(bool, bool)> =
+            sqlx::query_as("SELECT rolsuper, rolbypassrls FROM pg_roles WHERE rolname = $1")
+                .bind(role)
+                .fetch_optional(&mut *conn)
+                .await
+                .unwrap();
         let (superuser, bypass) =
             row.unwrap_or_else(|| panic!("service role {role} does not exist (DCR)"));
         assert!(!superuser, "service role {role} must not be superuser");
