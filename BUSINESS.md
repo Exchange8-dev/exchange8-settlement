@@ -1,7 +1,7 @@
-# BUSINESS.md: Ex8:Settlement — Business Requirements & DVP settlement, custody, FX, crypto, options
+# BUSINESS.md: Exchange8:Settlement — Business Requirements & DVP settlement, custody, FX, crypto, options
 
 > Audience: product owners, business analysts, and anyone evaluating what
-> Ex8:Settlement **does for the business**. For architecture read `README.md`;
+> Exchange8:Settlement **does for the business**. For architecture read `README.md`;
 > for wire-level detail read `DESIGN.md`.
 
 ## 1. Business Purpose
@@ -54,11 +54,11 @@
 
 | Concern | Owner |
 |---|---|
-| The event-sourced trade/position ledger and internal novation statements | Ex8:Clearing |
-| Order matching | Ex8:ME |
-| Margin calculation and margin calls | Ex8:Margin |
-| Regulatory transaction reporting | Ex8:Regulatory |
-| Instrument/pair/contract masters and tenor catalog | Ex8:RefData |
+| The event-sourced trade/position ledger and internal novation statements | Exchange8:Clearing |
+| Order matching | Exchange8:ME |
+| Margin calculation and margin calls | Exchange8:Margin |
+| Regulatory transaction reporting | Exchange8:Regulatory |
+| Instrument/pair/contract masters and tenor catalog | Exchange8:RefData |
 | Fiat money movement itself (ledger postings) | Bank8:Ledger |
 | Cron triggers for expiry and EOD job schedules | Sentin8:Cron |
 | Identity, tokens, M2M client registration | Sentin8:Auth |
@@ -143,9 +143,9 @@
 
 | Event / input | Source |
 |---|---|
-| `exchange8:clearing:trade:*` recorded trades | Ex8:Clearing ledger |
-| Liquidation events (collateral demand) | Ex8:Margin |
-| Instrument, FX pair and corporate-action definitions | Ex8:RefData |
+| `exchange8:clearing:trade:*` recorded trades | Exchange8:Clearing ledger |
+| Liquidation events (collateral demand) | Exchange8:Margin |
+| Instrument, FX pair and corporate-action definitions | Exchange8:RefData |
 | Expiry and EOD file schedule triggers | Sentin8:Cron |
 | Fiat settlement legs and margin-collateral entries | Bank8:Ledger (executed postings) |
 
@@ -222,10 +222,10 @@
 
 | Dependency | What the business relies on it for |
 |---|---|
-| Ex8:Clearing | The authoritative trade record this service novates and reports on |
-| Ex8:RefData | Instruments, FX pair/tenor definitions, corporate actions driving settlement |
-| Ex8:Margin | Collateral shortfall responses and margin requirement authority |
-| Ex8:Regulatory | The regulatory reporting outlet; settlement only supplies validated trades |
+| Exchange8:Clearing | The authoritative trade record this service novates and reports on |
+| Exchange8:RefData | Instruments, FX pair/tenor definitions, corporate actions driving settlement |
+| Exchange8:Margin | Collateral shortfall responses and margin requirement authority |
+| Exchange8:Regulatory | The regulatory reporting outlet; settlement only supplies validated trades |
 | Bank8:Ledger | Execution of every fiat leg and margin-collateral entry |
 | Sentin8:Cron | Expiry triggers and EOD file schedules |
 | Sentin8:Bus | Durable, audited event delivery (outbox producer pattern) |

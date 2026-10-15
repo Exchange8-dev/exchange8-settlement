@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8 crypto extension cores + margin rails.
+//! Exchange8 crypto extension cores + margin rails.
 //!
 //! - **Per-instrument precision**: the `fixed` crate carries
 //!   `Price { raw, scale }` / `Qty { raw, scale }` — this module asserts

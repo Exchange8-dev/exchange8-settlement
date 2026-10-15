@@ -1,8 +1,8 @@
-# README.md: Ex8:Settlement
+# README.md: Exchange8:Settlement
 
 ## 1. Summary
 
-Ex8:Settlement is the **external settlement integrations** service of the
+Exchange8:Settlement is the **external settlement integrations** service of the
 exchange8 vertical: novation (the central counterparty substitutes itself for
 both original counterparties per trade), custody and collateral for crypto and
 fiat rails, give-up/give-in allocation between executing and clearing brokers,
@@ -15,7 +15,7 @@ graceful drain.
 
 ## 2. Motivation
 
-- The internal trade/position ledger (Ex8:Clearing) and the external
+- The internal trade/position ledger (Exchange8:Clearing) and the external
   settlement integrations have fundamentally different failure models —
   deterministic event-sourced math on one side, external I/O with retry,
   ack/reconciliation and per-counterparty deploy cadence on the other. This
@@ -153,7 +153,7 @@ Pure cores; no pasted signatures — the concepts:
 ## 5. Rationale, Trade-offs, and Alternatives
 
 - **Split from the clearing ledger.** Novation custody of the platform's own
-  ledger stays in Ex8:Clearing (deterministic replay); this service owns
+  ledger stays in Exchange8:Clearing (deterministic replay); this service owns
   externally coupled effects whose failures are retried/reconciled rather than
   corrected by re-derivation. A single combined service was rejected: the two
   failure models (re-derivation vs. retry/reconcile) would contaminate one

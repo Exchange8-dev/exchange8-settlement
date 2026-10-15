@@ -3,14 +3,14 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:Settlement options lifecycle — exercise, assignment, expiry settlement.
+//! Exchange8:Settlement options lifecycle — exercise, assignment, expiry settlement.
 //!
 //! Implements the options workflow: auto-exercise at expiry,
 //! early exercise (American), short assignment (pro-rata or random), and
 //! cash/physical expiry settlement with the
 //! `open → expiring → exercised/assigned → settled` state machine.
 //!
-//! Pure core; the shell (Ex8:Clearing/Ex8:Settlement) wires Sentin8:Cron
+//! Pure core; the shell (Exchange8:Clearing/Exchange8:Settlement) wires Sentin8:Cron
 //! expiry triggers, persistence, and emits the
 //! `exchange8:clearing:exercise:requested`,
 //! `exchange8:clearing:assignment:allocated`,

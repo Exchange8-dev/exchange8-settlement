@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:Settlement core — novation, collateral, give-up allocation.
+//! Exchange8:Settlement core — novation, collateral, give-up allocation.
 //!
 //! Pure settlement logic; the shell wires the custody adapter trait, CCP
 //! sessions, and persistence.

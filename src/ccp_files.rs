@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:Settlement CCP EOD file builders — CDS 3-record layout (
+//! Exchange8:Settlement CCP EOD file builders — CDS 3-record layout (
 //! `Daemon/Feed/CDSFile.cpp` parity) plus the SIS/Fortis record shapes.
 //!
 //! The CDS export is a fixed-width text file: a transmission header, a batch
@@ -492,7 +492,7 @@ fn _eod_layout_doc() -> [(usize, &'static str); 18] {
 
 // ---------------------------------------------------------------------------
 // Settlement netting CSV (design: clearing doc §4.4 — "settlement netting
-// feed", owned by Ex8:Settlement)
+// feed", owned by Exchange8:Settlement)
 // ---------------------------------------------------------------------------
 
 /// One trade side to net.

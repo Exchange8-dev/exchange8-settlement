@@ -3,9 +3,9 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:SETTLEMENT service binary — novation, custody, collateral, give-up, block trades, EOD files.
+//! Exchange8:SETTLEMENT service binary — novation, custody, collateral, give-up, block trades, EOD files.
 //!
-//! Ex8:SETTLEMENT service binary — novation, custody, collateral, give-up, block trades, EOD files.
+//! Exchange8:SETTLEMENT service binary — novation, custody, collateral, give-up, block trades, EOD files.
 //!
 //! Design: `services/settlement/DESIGN.md`. Core logic in the sibling modules;
 //! this shell wires the tokio HTTP/TLS surface via the platform

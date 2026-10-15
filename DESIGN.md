@@ -1,4 +1,4 @@
-# DESIGN.md: Ex8:Settlement — Detailed Design Document
+# DESIGN.md: Exchange8:Settlement — Detailed Design Document
 
 ## 1. Scope & Context
 
@@ -19,7 +19,7 @@
 - Give-up allocations (`settlement.giveup`) and block/EFP/EFR trade reports
   (`settlement.block_trade`).
 - The FX conversion core and options exercise/assignment/expiry pure cores
-  (their persistent position/contract tables belong to Ex8:RefData
+  (their persistent position/contract tables belong to Exchange8:RefData
   (`exchange8.fx_pair`, `exchange8.fx_tenor`) and the contract master).
 - CCP EOD file exports (CDS, SIS, Fortis) and the settlement-netting CSV
   (reconciliation backstop), scheduled by Sentin8:Cron.
@@ -28,12 +28,12 @@
 **Does NOT own (delegates)**
 
 - The event-sourced trade/position ledger, statements, novation of internal
-  records — Ex8:Clearing.
-- Matching and margin calculation — Ex8:ME / Ex8:Margin.
-- Regulatory reporting — Ex8:Regulatory.
+  records — Exchange8:Clearing.
+- Matching and margin calculation — Exchange8:ME / Exchange8:Margin.
+- Regulatory reporting — Exchange8:Regulatory.
 - Fiat currency movement — Bank8:Ledger postings (this service computes the
   leg shapes; Ledger executes them).
-- Contract/position master tables — Ex8:RefData / contract-ledger owners.
+- Contract/position master tables — Exchange8:RefData / contract-ledger owners.
 - Cron triggers for expiry and EOD jobs — Sentin8:Cron.
 
 ### System context
@@ -41,10 +41,10 @@
 ```mermaid
 graph TD
     subgraph vertical["exchange8 vertical (db exchange8)"]
-        CLEARING["Ex8:Clearing (trade events)"]
-        MARGIN["Ex8:Margin (collateral shortfall, liquidation)"]
-        REFDATA["Ex8:RefData (instruments, fx_pair, corp actions)"]
-        OTHER["Ex8:ME / OMS / Risk / Regulatory"]
+        CLEARING["Exchange8:Clearing (trade events)"]
+        MARGIN["Exchange8:Margin (collateral shortfall, liquidation)"]
+        REFDATA["Exchange8:RefData (instruments, fx_pair, corp actions)"]
+        OTHER["Exchange8:ME / OMS / Risk / Regulatory"]
     end
 
     subgraph external["Trust boundary: external counterparties"]
@@ -61,7 +61,7 @@ graph TD
         PROXY["Sentin8:Proxy (single ingress, TLS)"]
     end
 
-    SVC["Ex8:Settlement<br/>exchange8-settlement"]
+    SVC["Exchange8:Settlement<br/>exchange8-settlement"]
 
     CLEARING -->|"exchange8:clearing:trade:* events"| SVC
     MARGIN -->|"liquidation events"| SVC
@@ -153,7 +153,7 @@ graph TD
 ```mermaid
 sequenceDiagram
     autonumber
-    participant CL as Ex8:Clearing ledger
+    participant CL as Exchange8:Clearing ledger
     participant H as shell relay/consumer
     participant E as NovationEngine
     participant DB as db exchange8 (schema settlement)
@@ -696,7 +696,7 @@ sequenceDiagram
 |---|---|
 | CCP unreachable | novation rows persist; trades queue pending in the engine; EOD files re-render as the reconciliation backstop |
 | Custody tx stuck | state machine sweep on `(env_id, state)` index → `failed` + alert |
-| Collateral shortfall | valuation shortfall surfaced to Ex8:Margin via events |
+| Collateral shortfall | valuation shortfall surfaced to Exchange8:Margin via events |
 | Give-up rejected | no allocation; trade stays with the executing broker |
 | Block report invalid | `state ∈ {too_small, off_market, late}` persisted, error `exchange8_block_trade_rejected` |
 | Relay outage | outbox rows retry; `idempotency_key` makes replay safe |
@@ -842,7 +842,7 @@ graph TD
   by the DBX pattern but not yet wired.
 - The `exchange8:clearing:exercise:requested`,
   `exchange8:clearing:assignment:allocated` and
-  `exchange8:clearing:expiry:settled` event flow crosses Ex8:Clearing's
+  `exchange8:clearing:expiry:settled` event flow crosses Exchange8:Clearing's
   ledger and this engine — the final producer/consumer split between the
   two services is pending the clearing integration.
 - CCP transport (SFTP/HTTPS drop, per-facility schedules in
@@ -851,9 +851,9 @@ graph TD
 - Real `CustodyAdapter` implementations (custodian API credential flows,
   chain signers) — only the in-memory reference exists.
 - Corporate-action settlement flow (cash/stock delivery on corp-action
-  events from Ex8:RefData) is in scope per the vertical design but has no
+  events from Exchange8:RefData) is in scope per the vertical design but has no
   implementation here yet.
-- Greeks-based margin interplay (Ex8:Margin SPAN vs portfolio margin for
+- Greeks-based margin interplay (Exchange8:Margin SPAN vs portfolio margin for
   option positions) — the collateral rows here are haircut-based; the
   margin-model handshake is a margin-design decision.
 

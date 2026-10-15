@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Ex8:Settlement FX core — currency exposure, spot settlement
+//! Exchange8:Settlement FX core — currency exposure, spot settlement
 //! rails, forwards + NDF settlement.
 //!
 //! - **Currency exposure**: per-currency net positions aggregated
