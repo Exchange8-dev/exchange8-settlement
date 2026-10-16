@@ -2,7 +2,11 @@
   "vertical": "exchange8",
   "services": [
     {
-      "service_type": "exchange8:settlement"
+      "service_type": "exchange8:settlement",
+      "telemetry_property": {
+        "slug": "settlement",
+        "name": "Exchange8:Settlement Telemetry"
+      }
     }
   ]
 }

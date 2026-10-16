@@ -120,7 +120,6 @@ graph TD
 The binary (`src/main.rs`) is a Sentin8 Shell assembly: `Sentin8Shell::new(
 "exchange8:settlement", "EXCHANGE8_SETTLEMENT")` with registration printing,
 `with_simple_state()`, and `with_router(extend_router)` that mounts the
-policy-admin API. The global allocator is mimalloc (`#[global_allocator]`),
 covering all in-process tokio workers. Boot, DB pool, drain, relay and audit
 pusher are shell-provided.
 
@@ -630,7 +629,6 @@ sequenceDiagram
   `exchange8-settlement-tls` workload resolves host context DB-free via
   `GET /v1/resolve/hostname` (`sentin8:sys:instances:read`). Post-quantum
   only; no classical fallback.
-- **Allocator** — mimalloc global allocator covers HTTP, relay, journal
   pusher and Cron-triggered workers alike.
 
 ## 6. Failure Modes & Recovery

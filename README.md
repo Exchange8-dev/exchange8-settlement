@@ -72,7 +72,6 @@ graph TD
     end
 
     subgraph platform["Sentin8 platform"]
-        SHELL["sentin8::shell<br/>DB pool, drain, mimalloc"]
         AUTH["Sentin8:Auth (issuer, DCR)"]
         BUS["Sentin8:Bus POST /v1/produce"]
         SYS["Sentin8:Sys POST /v1/audit"]
