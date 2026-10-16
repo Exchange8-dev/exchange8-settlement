@@ -288,7 +288,7 @@ sequenceDiagram
         E->>E: auto-exercise ITM longs (intrinsic ≥ threshold)
         E->>E: assign shorts, net positions → deliveries (physical)
         E-->>DB: ExpiryOutcome {exercises, assignments, cash_settled_raw, deliveries}
-        Note over E: cash-settled contracts pay intrinsic value;<br/>physical produces +receive / −deliver legs
+    Note over H,DB: cash-settled contracts pay intrinsic value,<br/>physical produces +receive / −deliver legs
     end
 ```
 
@@ -311,7 +311,7 @@ sequenceDiagram
     F-->>CR: fixed-width content + filename<br/>(VER1.ISIN.P.<date>.0001.part | <date>.emcf | CDS transmission)
     CR->>DB: write netting CSV row set (audit journaled)
     alt facility unreachable
-        CR->>CR: retry (files are re-renderable; idempotent exports)
+        CR->>CR: retry (files are re-renderable, idempotent exports)
     else delivered
         F-->>CCR: file upload / SFT drop
     end
@@ -684,7 +684,7 @@ sequenceDiagram
 
     W->>DB: BEGIN — novation + outbox + audit rows
     W->>W: CRASH before relay (tx COMMITTED)
-    Note over DB: novation UNIQUE holds; outbox unrelayed; audit unpushed
+    Note over W,R: novation UNIQUE holds, outbox unrelayed, audit unpushed
     R->>DB: boot: SELECT unrelayed outbox
     R->>DB: POST /v1/produce (idempotency_key = row id)
     Note over R: Bus dedupes → no duplicate consumer work
