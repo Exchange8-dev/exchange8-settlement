@@ -6,7 +6,7 @@
 //! Exchange8 SQL integration tests.
 //!
 //! Runs against the live platform PostgreSQL (18) using the
-//! `exchange8_probe` non-bypass role — the RLS matrix:
+//! `exchange8_probe` non-bypass role - the RLS matrix:
 //!   1. no tenant context → 0 rows (silent enforcement)
 //!   2. own env context → own rows only
 //!   3. cross-env → 0 rows
@@ -33,7 +33,7 @@ fn env_b() -> Uuid {
 
 async fn probe_conn() -> Option<sqlx::pool::PoolConnection<sqlx::Postgres>> {
     // NOTE (architecture-principles.md §4.3d): tenant context is
-    // connection-local — every test acquires ONE connection and does all
+    // connection-local - every test acquires ONE connection and does all
     // statements on it (never pool connection A for context, B for data).
     let pool = PgPool::connect(PROBE_URL).await.ok()?;
     pool.acquire().await.ok()
@@ -104,7 +104,7 @@ async fn rls_matrix_cross_env_returns_zero() {
 }
 
 /// Settlement-owned idempotency substrate: novation is unique per
-/// (env, trade) — a re-novation of the same trade never produces a second
+/// (env, trade) - a re-novation of the same trade never produces a second
 /// row (the engine dedupes in-memory; the schema is the backstop).
 #[tokio::test]
 async fn novation_unique_per_env_trade() {
@@ -137,7 +137,7 @@ async fn novation_unique_per_env_trade() {
     tx.rollback().await.unwrap();
 }
 
-/// Every exchange8 service role exists, non-super, non-bypass — read
+/// Every exchange8 service role exists, non-super, non-bypass - read
 /// directly from pg_roles (no schema-privilege indirection).
 #[tokio::test]
 async fn service_roles_exist_non_bypass() {

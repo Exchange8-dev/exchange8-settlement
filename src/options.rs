@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:Settlement options lifecycle — exercise, assignment, expiry settlement.
+//! Exchange8:Settlement options lifecycle - exercise, assignment, expiry settlement.
 //!
 //! Implements the options workflow: auto-exercise at expiry,
 //! early exercise (American), short assignment (pro-rata or random), and
@@ -196,7 +196,7 @@ impl ExerciseEngine {
         let mut cash_total: i128 = 0;
         let mut deliveries: HashMap<u64, i64> = HashMap::new();
 
-        // Snapshot original positions — physical delivery derives from the
+        // Snapshot original positions - physical delivery derives from the
         // pre-exercise net position (exercise() mutates them in place).
         let originals: Vec<OptionPosition> = self
             .positions
@@ -229,7 +229,7 @@ impl ExerciseEngine {
 
         // Physical: net ITM positions convert to underlying delivery
         // obligations (long call receives, short call delivers; puts
-        // reversed). OTM legs expire worthless — no delivery.
+        // reversed). OTM legs expire worthless - no delivery.
         if style == SettlementStyle::Physical {
             for p in &originals {
                 if p.qty == 0
@@ -390,7 +390,7 @@ impl ExerciseEngine {
                 let mut avail: Vec<(u64, u64)> =
                     shorts.iter().map(|(a, q)| (*a, *q as u64)).collect();
                 while remaining > 0 && !avail.is_empty() {
-                    // xorshift64* — deterministic, seedable.
+                    // xorshift64* - deterministic, seedable.
                     self.rng_seed ^= self.rng_seed >> 12;
                     self.rng_seed ^= self.rng_seed << 25;
                     self.rng_seed ^= self.rng_seed >> 27;
@@ -467,7 +467,7 @@ mod tests {
             underlying_price_raw: 12_000,
         };
         let out = e.early_exercise(&req).unwrap();
-        // No short holders — exercise reduces the long, produces no assignments.
+        // No short holders - exercise reduces the long, produces no assignments.
         assert!(out.is_empty());
         // Long reduced.
         assert_eq!(e.positions.get(&(100, 1)).unwrap().qty, 6);

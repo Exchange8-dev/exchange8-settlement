@@ -3,9 +3,9 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:SETTLEMENT service binary — novation, custody, collateral, give-up, block trades, EOD files.
+//! Exchange8:SETTLEMENT service binary - novation, custody, collateral, give-up, block trades, EOD files.
 //!
-//! Exchange8:SETTLEMENT service binary — novation, custody, collateral, give-up, block trades, EOD files.
+//! Exchange8:SETTLEMENT service binary - novation, custody, collateral, give-up, block trades, EOD files.
 //!
 //! Design: `services/settlement/DESIGN.md`. Core logic in the sibling modules;
 //! this shell wires the tokio HTTP/TLS surface via the platform
@@ -27,7 +27,7 @@ fn extend_router(
     app: axum::Router<std::sync::Arc<sentin8::shell::AppState>>,
     _state: std::sync::Arc<sentin8::shell::AppState>,
 ) -> axum::Router<std::sync::Arc<sentin8::shell::AppState>> {
-    // ── Shield policy-admin API (services/settlement/DESIGN.md §4 —
+    // ── Shield policy-admin API (services/settlement/DESIGN.md §4 -
     // shared implementation; the shell AppState implements HasPolicyAdmin).
     sentin8::shell::mount_policy_admin(
         // EOD file jobs run on Sentin8:Cron; custody adapters are trait impls

@@ -1,20 +1,20 @@
-# Exchange8:Settlement — Detailed Design Document
+# Exchange8:Settlement - Detailed Design Document
 
 ## 1. Scope & Context
 
 **Owns**
 
-- Novation records (`settlement.novation`) — per-trade CCP substitution,
+- Novation records (`settlement.novation`) - per-trade CCP substitution,
   idempotent per `(env_id, trade_id)`, with a dense `novation_seq`.
 - CCP facility routing (`settlement.ccp_facility`, `settlement.ccp_facility_file`,
-  `settlement.security_to_ccp`, `settlement.clearing`) — endpoint configuration,
+  `settlement.security_to_ccp`, `settlement.clearing`) - endpoint configuration,
   per-file-family credential refs and schedules, security→CCP mapping,
   participant clearing assignment.
 - Custody (`settlement.asset`, `settlement.custody_account`,
-  `settlement.custody_transaction`) — crypto asset master, per-env custody
+  `settlement.custody_transaction`) - crypto asset master, per-env custody
   addresses, on-chain transaction ledger with the
   `pending → signed → broadcast → confirmed / failed` state machine.
-- Collateral (`settlement.collateral`) — balances, haircuts, concentration
+- Collateral (`settlement.collateral`) - balances, haircuts, concentration
   buckets, rehypothecation flag.
 - Give-up allocations (`settlement.giveup`) and block/EFP/EFR trade reports
   (`settlement.block_trade`).
@@ -28,13 +28,13 @@
 **Does NOT own (delegates)**
 
 - The event-sourced trade/position ledger, statements, novation of internal
-  records — Exchange8:Clearing.
-- Matching and margin calculation — Exchange8:ME / Exchange8:Margin.
-- Regulatory reporting — Exchange8:Regulatory.
-- Fiat currency movement — Bank8:Ledger postings (this service computes the
+  records - Exchange8:Clearing.
+- Matching and margin calculation - Exchange8:ME / Exchange8:Margin.
+- Regulatory reporting - Exchange8:Regulatory.
+- Fiat currency movement - Bank8:Ledger postings (this service computes the
   leg shapes; Ledger executes them).
-- Contract/position master tables — Exchange8:RefData / contract-ledger owners.
-- Cron triggers for expiry and EOD jobs — Sentin8:Cron.
+- Contract/position master tables - Exchange8:RefData / contract-ledger owners.
+- Cron triggers for expiry and EOD jobs - Sentin8:Cron.
 
 ### System context
 
@@ -168,8 +168,8 @@ sequenceDiagram
         E-->>H: original NovatedTrade (idempotent, no new seq)
     end
     H->>DB: INSERT settlement.novation (UNIQUE env_id,trade_id)
-    H->>DB: INSERT settlement.outbox (event payload) — same tx
-    H->>DB: INSERT settlement.audit_journal — same tx
+    H->>DB: INSERT settlement.outbox (event payload) - same tx
+    H->>DB: INSERT settlement.audit_journal - same tx
     H->>DB: COMMIT
     alt relay succeeds
         H->>B: POST /v1/produce (idempotency_key = outbox id)
@@ -314,7 +314,7 @@ sequenceDiagram
     else delivered
         F-->>CCR: file upload / SFT drop
     end
-    Note over CR,CCR: EOD files are a reconciliation backstop —<br/>the primary mechanism is real-time novation
+    Note over CR,CCR: EOD files are a reconciliation backstop -<br/>the primary mechanism is real-time novation
 ```
 
 ## 3. Data Model
@@ -525,7 +525,7 @@ stateDiagram-v2
 ## 4. API Surface
 
 Grouped by audience; the authorization gate for all handler surfaces is the
-8-step platform pipeline — bearer verify → tenant resolve → feature gate →
+8-step platform pipeline - bearer verify → tenant resolve → feature gate →
 **Shield (`exchange8:settlement-policy` scope-mirror, enforced)** → RLS
 context → execute → audit. The HTTP router mounts health, `/openapi.json`
 and the Shield policy-admin API only; domain triggers arrive via events and
@@ -538,12 +538,12 @@ Cron.
 | System (M2M) | Give-up allocation / block validation (`exchange8:giveup:write`, `exchange8:blocktrade:write`) | scope-mirror permit | outbox event (see §10) |
 | System (M2M) | FX legs + exposure verdicts (`exchange8:settlement:write`) | scope-mirror permit | outbox event (see §10) |
 | System (M2M) | Exercise / assignment / expiry (`exchange8:novation:write`) | scope-mirror permit | `exchange8:clearing:exercise:requested`, `exchange8:clearing:assignment:allocated`, `exchange8:clearing:expiry:settled` |
-| Admin (RFW) | `/v1/admin/ui/novation` + `POST /v1/admin/novation` (page `Novation`) | `exchange8:novation:read` / `:write` | — |
-| Admin (RFW) | `/v1/admin/ui/custody` + `POST /v1/admin/custody` (page `Custody`) | `exchange8:custody:read` / `:write` | — |
-| Admin (RFW) | `/v1/admin/ui/collateral` + `POST /v1/admin/collateral` | `exchange8:collateral:read` / `:write` | — |
-| Admin (RFW) | `/v1/admin/ui/blocks` + `POST /v1/admin/blocks` (page `Block Trades`) | `exchange8:blocktrade:read` / `:write` | — |
+| Admin (RFW) | `/v1/admin/ui/novation` + `POST /v1/admin/novation` (page `Novation`) | `exchange8:novation:read` / `:write` | - |
+| Admin (RFW) | `/v1/admin/ui/custody` + `POST /v1/admin/custody` (page `Custody`) | `exchange8:custody:read` / `:write` | - |
+| Admin (RFW) | `/v1/admin/ui/collateral` + `POST /v1/admin/collateral` | `exchange8:collateral:read` / `:write` | - |
+| Admin (RFW) | `/v1/admin/ui/blocks` + `POST /v1/admin/blocks` (page `Block Trades`) | `exchange8:blocktrade:read` / `:write` | - |
 | Admin | Shield policy-admin API (`exchange8:settlement:policy:read` / `:write`) | role `exchange8:settlement:admin` | `sentin8:sys:policy` family |
-| Ops | `GET /v1/health`, `/openapi.json` | unauthenticated (health), none | — |
+| Ops | `GET /v1/health`, `/openapi.json` | unauthenticated (health), none | - |
 
 Declared error codes: `exchange8_novation_failed` (500),
 `exchange8_block_trade_rejected` (422).
@@ -559,7 +559,7 @@ sequenceDiagram
     participant B as Sentin8:Bus
     participant T as Trigger (owner service / Cron / Flow)
 
-    W->>DB: BEGIN — domain INSERT/UPDATE
+    W->>DB: BEGIN - domain INSERT/UPDATE
     W->>DB: INSERT settlement.outbox (payload + idempotency)
     W->>DB: COMMIT (pg_notify settlement_outbox_changed)
     R->>DB: SELECT unrelayed outbox rows
@@ -584,47 +584,47 @@ sequenceDiagram
     A->>DB: SELECT unpushed audit_journal rows
     A->>S: POST /v1/audit (sentin8:sys:audit:write)
     S-->>A: 200 → mark pushed
-    Note over A,S: Sys outage never drops audit — rows retry until pushed
+    Note over A,S: Sys outage never drops audit - rows retry until pushed
 ```
 
 ## 5. Cross-Cutting Concerns
 
-- **Authentication** — Sentin8:Auth is the only issuer. User access uses
+- **Authentication** - Sentin8:Auth is the only issuer. User access uses
   user tokens; system-driven novation/collateral/expiry use cert-bound M2M
   `client_credentials` tokens (DCR-registered per workload: `exchange8:settlement`,
   `exchange8:settlement-policy`, `settlement-audit`,
   `exchange8-settlement-tls`). DCR is fail-closed: only workloads present in
   `sentin8_service_workloads` (seeded by `sentin8-cli vertical enroll`) can
   register.
-- **Authorization** — the scope-mirror policy set (`origin='platform'`,
+- **Authorization** - the scope-mirror policy set (`origin='platform'`,
   `mode='enforced'`) permits each declared action for callers holding the
   matching scope or the platform-admin scopes (`sentin8:sys:admin`,
   `sentin8:sys:org:admin`, `sentin8:sys:env:admin`). No-set → deny
   (fail-closed); shadow is an emergency rollback lever only; `token_tp`
   never bypasses policy.
-- **Tenant resolution + RLS** — every table has `ENABLE` + `FORCE ROW LEVEL
+- **Tenant resolution + RLS** - every table has `ENABLE` + `FORCE ROW LEVEL
   SECURITY` with policies `sentin8_context_initialized() AND env_id =
   sentin8_current_env_id()`; the context is set with
   `SELECT sentin8_set_tenant_context(...)` (`set_config(..., true)`,
-  transaction-local) on the **same connection** as the data statements — the
+  transaction-local) on the **same connection** as the data statements - the
   async helper must be awaited or RLS silently sees no context. Explicit
   `env_id = $N` predicates remain the primary defense; RLS is the backstop.
   Role `exchange8_settlement_service` carries no `BYPASSRLS`.
-- **Idempotency** — novation: UNIQUE `(env_id, trade_id)` + engine re-entry;
+- **Idempotency** - novation: UNIQUE `(env_id, trade_id)` + engine re-entry;
   custody: `tx_ref` dedup → `CustodyOutcome::Duplicate`; batch relay:
   `idempotency_key` = outbox row id at Bus `POST /v1/produce`; settlement
   batches: net-then-check atomically.
-- **Rate limiting / bot protection** — ingress tier is the platform edge
+- **Rate limiting / bot protection** - ingress tier is the platform edge
   (Sentin8:Proxy); service-local rate policies ride the Shield policy
   surface (per-tenant sets), not bespoke code.
-- **Audit journaling** — every state transition writes
+- **Audit journaling** - every state transition writes
   `settlement.audit_journal` (same transaction where possible); the pusher
   drains to `POST /v1/audit`; Sys outage retries without loss.
-- **Drain** — `sentin8::shell` graceful drain on upgrade: HTTP stops
+- **Drain** - `sentin8::shell` graceful drain on upgrade: HTTP stops
   accepting, in-flight requests finish, the relay/journal pusher checkpoint
   unrelayed/unpushed rows, and Sentin8:Captain's `upgrade-instance` swaps
   the binary (rolling, zero-downtime).
-- **TLS** — terminated in-process by `sentin8-tls` behind Sentin8:Proxy
+- **TLS** - terminated in-process by `sentin8-tls` behind Sentin8:Proxy
   (single ingress, SNI `exchange8-settlement.sys.ops…`); the
   `exchange8-settlement-tls` workload resolves host context DB-free via
   `GET /v1/resolve/hostname` (`sentin8:sys:instances:read`). Post-quantum
@@ -639,8 +639,8 @@ sequenceDiagram
 flowchart TD
     A["Custody / settlement instruction"] --> B["Balance + limit gate"]
     B -->|"ok"| C["Apply movement, INSERT custody_transaction 'pending'"]
-    B -->|"insufficient"| D["Reject: Insufficient — no durable state"]
-    B -->|"duplicate tx_ref"| D2["Return Duplicate — no second apply"]
+    B -->|"insufficient"| D["Reject: Insufficient - no durable state"]
+    B -->|"duplicate tx_ref"| D2["Return Duplicate - no second apply"]
     C --> E{"sign → broadcast"}
     E -->|"fails"| F["state = pending (retry)"]
     F --> C
@@ -648,8 +648,8 @@ flowchart TD
     G --> H{"confirmation <br/>window"}
     H -->|"confirmed"| I["state = confirmed"]
     H -->|"timeout"| J["state = failed + alert"]
-    J --> K["manual replay — idempotent by tx_ref"]
-    C --> L["INSERT settlement.outbox — same tx"]
+    J --> K["manual replay - idempotent by tx_ref"]
+    C --> L["INSERT settlement.outbox - same tx"]
     L --> M{"relay to Bus"}
     M -->|"fail"| N["retry backoff (row unrelayed)"]
     M -->|"ok"| O["relayed = true"]
@@ -680,7 +680,7 @@ sequenceDiagram
     participant DB as db exchange8
     participant R as Relay (next boot / retry loop)
 
-    W->>DB: BEGIN — novation + outbox + audit rows
+    W->>DB: BEGIN - novation + outbox + audit rows
     W->>W: CRASH before relay (tx COMMITTED)
     Note over W,R: novation UNIQUE holds, outbox unrelayed, audit unpushed
     R->>DB: boot: SELECT unrelayed outbox
@@ -721,21 +721,21 @@ graph LR
     AL -->|"M2M POST /v1/audit"| SYS[("Sentin8:Sys")]
 ```
 
-- **Task layout** — one HTTP acceptor; one relay task (LISTEN
+- **Task layout** - one HTTP acceptor; one relay task (LISTEN
   `settlement_outbox_changed` + periodic unrelayed poll); one audit pusher;
   Cron-triggered jobs (EOD file render, options expiry) spawn as short-lived
   tasks. No cross-task shared mutable state in the cores: engines are
   per-trigger instances fed by projections, so no mutex contention on the
   hot path.
-- **Pool sizing** — the shared `sentin8_config::pg_pool::connect` caps
+- **Pool sizing** - the shared `sentin8_config::pg_pool::connect` caps
   connections (default 3, overridable) so ~20 services cannot exhaust
   PostgreSQL. Relay and journal use the same pool; context is set
   transaction-locally per statement set.
-- **Hot paths** — novation insert (single UNIQUE-guarded row + outbox row);
+- **Hot paths** - novation insert (single UNIQUE-guarded row + outbox row);
   exposure check (pure in-memory bucket math); file render (pure string
   building). Cache: nothing is hot-cached beyond the policy engine set
   (Shield hot-reload consumer keeps the loaded sets fresh).
-- **Backpressure** — outbox partial index bounds the relay scan; unrelayed
+- **Backpressure** - outbox partial index bounds the relay scan; unrelayed
   rows retry with backoff so a Bus outage does not spin; the drain path
   checkpoints before shutdown.
 
@@ -743,7 +743,7 @@ graph LR
 
 Invariants (always true):
 
-1. Novation is idempotent per `(env_id, trade_id)` — a re-delivery never
+1. Novation is idempotent per `(env_id, trade_id)` - a re-delivery never
    creates a second row or advances `novation_seq`.
 2. A domain write and its `settlement.outbox` (and wherever possible
    `settlement.audit_journal`) row are committed in the **same**
@@ -763,22 +763,22 @@ Invariants (always true):
 9. CCP export records match the pinned per-record byte lengths (CDS r1 = 80,
    r2 = r3 = 81; EOD records end `#` + LF); netting CSV always includes a
    header row.
-10. No plaintext private keys, custodian credentials or file credentials —
+10. No plaintext private keys, custodian credentials or file credentials -
     only `*_secret_ref` values; no role carries `BYPASSRLS`.
 
 Insecure defaults rejected:
 
-- **`danger_accept_invalid_certs` / hand-rolled CA loading** — TLS is
+- **`danger_accept_invalid_certs` / hand-rolled CA loading** - TLS is
   in-process via `sentin8-tls` (post-quantum, root CA in the OS trust
   store).
-- **Direct cross-schema/table joins into other services** — cross-service
+- **Direct cross-schema/table joins into other services** - cross-service
   data flows are membus/bus/owner-API per the access-order rule (this
   service declares zero cross-schema grants today).
-- **Static superuser service DSN** — the service role is unprivileged,
+- **Static superuser service DSN** - the service role is unprivileged,
   non-bypass, database-`exchange8`-only.
-- **Plaintext wallet keys in process** — design rejects the pattern;
+- **Plaintext wallet keys in process** - design rejects the pattern;
   adapters reference secrets.
-- **Per-leg settlement fallback for crypto batches** — an atomicity
+- **Per-leg settlement fallback for crypto batches** - an atomicity
   compromise rejected in favor of all-or-nothing batches.
 
 No `unsafe` blocks exist in this service; the unsafe-rationale section is
@@ -789,7 +789,7 @@ invariants above (scale pins, tx_ref dedup, same-connection context).
 
 ```mermaid
 graph TD
-    PYRAMID["Test pyramid — exchange8-settlement"] --> UT["Unit (pure cores)"]
+    PYRAMID["Test pyramid - exchange8-settlement"] --> UT["Unit (pure cores)"]
     PYRAMID --> PWT["Policy wiring (tests/policy.rs)"]
     PYRAMID --> SQL["SQL matrix (tests/sql_matrix.rs, live DB)"]
     PYRAMID --> E2E["Vertical E2E (e2e-ts/, UI + BFF only)"]
@@ -809,31 +809,31 @@ graph TD
     E2E --> E1["human-parity flows; no direct SQL/backend"]
 ```
 
-- **Unit/property layer** — pure cores own all domain math: novation
+- **Unit/property layer** - pure cores own all domain math: novation
   idempotency, pending-queue recovery order, collateral caps, give-up
   gates, block verdicts, exposure bucket/total limit precedence (strict
-  `>` — at-limit is compliant), scale-pair guards, custody dedup, batch
+  `>` - at-limit is compliant), scale-pair guards, custody dedup, batch
   atomicity, withdrawal step-up/min/cap, assignment conservation, expiry
   threshold behavior, and CCP record byte-length assertions (the wire
   contract).
-- **Policy layer** — proves the *real* seeded scope-mirror text evaluates
+- **Policy layer** - proves the *real* seeded scope-mirror text evaluates
   fail-closed, respects mode and origin, isolates sets per `env_id`, keeps
   M2M parity, and dry-runs clean at enroll.
-- **SQL matrix** — live PostgreSQL via the non-bypass `exchange8_probe`
+- **SQL matrix** - live PostgreSQL via the non-bypass `exchange8_probe`
   role: RLS enforcement (no context → 0 rows, own env → own rows, cross
   env → 0 rows) and the service-role catalog check. Skips silently when
   the DB is unreachable so test runs stay hermetic.
-- **Deliberately not tested here** — platform TLS/RLS plumbing itself,
+- **Deliberately not tested here** - platform TLS/RLS plumbing itself,
   Sentin8:Bus delivery guarantees, Shield engine internals: covered by the
   platform's own test strategy docs.
-- **E2E** — the vertical's `e2e-ts` suite drives the real UI through BFF
+- **E2E** - the vertical's `e2e-ts` suite drives the real UI through BFF
   only (no direct SQL), so settlement surfaces are exercised as a human
   would.
 
 ## 10. Open Questions
 
 - RFW admin pages (`novation`, `custody`, `collateral`, `blocks`) are
-  registered but their data/UI handlers are not mounted in this binary —
+  registered but their data/UI handlers are not mounted in this binary -
   wiring the `RFC 4.15` admin surface for these resources is outstanding.
 - `settlement.outbox` event emission from handlers (event types, stream
   families, trigger registrations in `vertical-registry.json`) is designed
@@ -841,18 +841,18 @@ graph TD
 - The `exchange8:clearing:exercise:requested`,
   `exchange8:clearing:assignment:allocated` and
   `exchange8:clearing:expiry:settled` event flow crosses Exchange8:Clearing's
-  ledger and this engine — the final producer/consumer split between the
+  ledger and this engine - the final producer/consumer split between the
   two services is pending the clearing integration.
 - CCP transport (SFTP/HTTPS drop, per-facility schedules in
   `ccp_facility_file.schedule`) and acknowledgement/ingest handling are not
   yet implemented (the builders + netting CSV are).
 - Real `CustodyAdapter` implementations (custodian API credential flows,
-  chain signers) — only the in-memory reference exists.
+  chain signers) - only the in-memory reference exists.
 - Corporate-action settlement flow (cash/stock delivery on corp-action
   events from Exchange8:RefData) is in scope per the vertical design but has no
   implementation here yet.
 - Greeks-based margin interplay (Exchange8:Margin SPAN vs portfolio margin for
-  option positions) — the collateral rows here are haircut-based; the
+  option positions) - the collateral rows here are haircut-based; the
   margin-model handshake is a margin-design decision.
 
 ---

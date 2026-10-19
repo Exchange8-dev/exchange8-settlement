@@ -16,7 +16,7 @@ graceful drain.
 ## 2. Motivation
 
 - The internal trade/position ledger (Exchange8:Clearing) and the external
-  settlement integrations have fundamentally different failure models —
+  settlement integrations have fundamentally different failure models -
   deterministic event-sourced math on one side, external I/O with retry,
   ack/reconciliation and per-counterparty deploy cadence on the other. This
   service owns the external side exclusively.
@@ -32,7 +32,7 @@ graceful drain.
 - FX settlement legs must be produced exactly once per dealt trade, with
   per-currency and per-value-date exposure limits enforced pre-trade.
 - Options expiry must auto-exercise in-the-money longs, assign shorts
-  (pro-rata or random) and settle cash or physical — deterministically and
+  (pro-rata or random) and settle cash or physical - deterministically and
   idempotently.
 
 ## 3. Architecture & High-Level Design
@@ -106,44 +106,44 @@ audit pusher drains `settlement.audit_journal` to Sentin8:Sys
 
 ## 4. Key Traits and Data Structures
 
-Pure cores; no pasted signatures — the concepts:
+Pure cores; no pasted signatures - the concepts:
 
-- **Novation (`NovationEngine`)** — replaces both original counterparties with
+- **Novation (`NovationEngine`)** - replaces both original counterparties with
   the CCP. Idempotent per `trade_id`: re-novating returns the original
   `novation_seq`. A dense per-session sequence (1, 2, 3 …) is handed out in
   insertion order. A **pending queue** holds trades recorded while the CCP was
   unavailable; recovery drains it oldest-first.
-- **Collateral valuation (`CollateralAccount`)** — per-asset post-haircut
+- **Collateral valuation (`CollateralAccount`)** - per-asset post-haircut
   value (`market_value × (10 000 − haircut_bps) / 10 000`), then a
   concentration cap: the largest bucket's contribution is trimmed to
   `concentration_bps` of the pre-cap total.
-- **Give-up allocator (`GiveUpAllocator`)** — validates the
+- **Give-up allocator (`GiveUpAllocator`)** - validates the
   (executing broker → clearing broker) pair against an approved-pair set and
   a minimum quantity; produces an allocation awaiting acceptance.
-- **Block validation (`validate_block`)** — a negotiated trade report is
+- **Block validation (`validate_block`)** - a negotiated trade report is
   `Accepted`, `TooSmall` (below min qty), `OffMarket` (outside the reference
   band) or `Late` (past the reporting deadline).
 - **FX conversion core (`CurrencyExposure`, `spot_settlement_legs`,
-  `settle_forward`, `settle_ndf`)** — a dealt FX trade maps to signed
+  `settle_forward`, `settle_ndf`)** - a dealt FX trade maps to signed
   (+base, −quote) client legs; exposure aggregates per
   (currency, value-date bucket) with per-bucket and per-currency-total
   limits; NDFs net to a single quote-currency amount (no delivery).
-- **Custody (`CustodyAdapter`)** — the integration contract: secret-ref
+- **Custody (`CustodyAdapter`)** - the integration contract: secret-ref
   credentials, `apply` (deposit/withdraw outcomes `Applied`, `Insufficient`,
   `Unknown`, `Duplicate`), balance query. `MemoryCustody` is the in-memory
   reference; real impls wrap a custodian API. **Settlement batches**
   (`evaluate_batch`) are atomic: legs are netted per (account, asset) first,
   and a single under-covered deliver leg rejects the whole batch.
-- **Withdrawal authorization (`authorize_withdrawal`)** — fresh step-up auth
+- **Withdrawal authorization (`authorize_withdrawal`)** - fresh step-up auth
   required, per-asset minimum and 24 h notional cap.
-- **Options exercise (`ExerciseEngine`)** — positions keyed by
+- **Options exercise (`ExerciseEngine`)** - positions keyed by
   (instrument, account); early exercise American-only and quantity-capped;
   expiry auto-exercises ITM longs above a configurable threshold; shorts are
   assigned **pro-rata (largest-remainder)** or **weighted-random**
   (deterministic xorshift64* seed); cash settlement pays intrinsic value,
   physical settlement converts net positions into underlying delivery
   obligations.
-- **CCP files (`CdsFile`, `SisFile`, `FortisFile`, `net_trades`)** —
+- **CCP files (`CdsFile`, `SisFile`, `FortisFile`, `net_trades`)** -
   fixed-width renderers with pinned field widths (fill helpers
   `fill_alpha`/`fill_numeric`/`fill_decimal`/`fill_time`/`eod_fill_price`);
   the netting CSV reports a `net_qty`/`net_amount` row per participant and
@@ -160,13 +160,13 @@ Pure cores; no pasted signatures — the concepts:
 - **In-memory pending queue in the pure core vs persistence-first queue.**
   The pure core uses an in-memory pending queue for the CCP-down path; the
   durable behavior is the `settlement.novation` UNIQUE `(env_id, trade_id)`
-  row plus the event relay — the shell persists the sequence with the row, so
+  row plus the event relay - the shell persists the sequence with the row, so
   recovery is replay-safe even though the core's set is volatile (see
   `DESIGN.md` §6).
 - **Atomic batches instead of per-leg settlement (crypto).** All-or-nothing
   batching prevents a partially applied multi-leg move (e.g. receive of one
   leg without the deliver of the other). Rejected alternative: per-leg
-  settlement with compensating reversals — more complex and racy under
+  settlement with compensating reversals - more complex and racy under
   concurrent withdrawals.
 - **Largest-remainder pro-rata vs pure float allocation.** Integer
   largest-remainder keeps assignment sums exact and total-assignment
@@ -188,14 +188,14 @@ Pure cores; no pasted signatures — the concepts:
   durable record, and the UNIQUE constraint is the idempotency backstop
   against relay retries producing double novation.
 - The pending-queue drain (`novate_pending`) re-enters `novate`, so already
-  novated trades collapse to their original result — recovery is safe to
+  novated trades collapse to their original result - recovery is safe to
   re-run.
 - `checked_notional_same_scale` accepts only the instrument-consistent
-  scale pairs — equity `(4, 0)` and crypto `(8, 8)`; any other mix returns
+  scale pairs - equity `(4, 0)` and crypto `(8, 8)`; any other mix returns
   `None` instead of producing a silently wrong notional.
 - `MemoryCustody` records `tx_ref` before the balance check, so a replay of
   the same movement returns `Duplicate` even if the first application
-  failed on funds — retries never double-apply or partially apply.
+  failed on funds - retries never double-apply or partially apply.
 - `evaluate_batch` nets legs per (account, asset) inside the batch before
   checking custody balances; intra-batch offsetting must never require
   external funds.
@@ -224,7 +224,7 @@ Pure cores; no pasted signatures — the concepts:
 - CCP session scheduling (file jobs on Sentin8:Cron, export transport to the
   facility) and the corporate-action settlement flow are vertical-design
   topics not yet implemented in this unit.
-- Real `CustodyAdapter` implementations (custodian API, chain signer) — the
+- Real `CustodyAdapter` implementations (custodian API, chain signer) - the
   in-memory reference is the only impl in-tree.
 - See `DESIGN.md` §10 for the full list.
 

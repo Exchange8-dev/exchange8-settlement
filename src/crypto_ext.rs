@@ -6,7 +6,7 @@
 //! Exchange8 crypto extension cores + margin rails.
 //!
 //! - **Per-instrument precision**: the `fixed` crate carries
-//!   `Price { raw, scale }` / `Qty { raw, scale }` — this module asserts
+//!   `Price { raw, scale }` / `Qty { raw, scale }` - this module asserts
 //!   the ×10⁸ crypto scale semantics and mixed-scale arithmetic safety.
 //! - **Continuous market mode**: the 24/7 market state machine
 //!   (no calendar phases; halt/resume only).
@@ -14,10 +14,10 @@
 //!   deterministic in-memory reference implementation (deposits,
 //!   withdrawals, balances) with secret-ref credentials.
 //! - **Atomic/batched settlement events**: the settlement batch
-//!   builder (atomic group — all legs settle or none).
+//!   builder (atomic group - all legs settle or none).
 //! - **Withdrawal step-up auth + per-asset notional limits**.
 //! - **Margin rails**: fiat margin via Bank8:Ledger ledger-entries,
-//!   crypto margin via the custody adapter — the transfer shapes.
+//!   crypto margin via the custody adapter - the transfer shapes.
 //!
 //! Design: `services/settlement/DESIGN.md` §2, §3, §8.
 
@@ -26,7 +26,7 @@ use std::collections::HashMap;
 use exchange8::fixed::{Price, Qty};
 
 // ---------------------------------------------------------------------------
-// C1.1 — precision semantics (crypto ×10⁸)
+// C1.1 - precision semantics (crypto ×10⁸)
 // ---------------------------------------------------------------------------
 
 /// Crypto scale constants.
@@ -50,7 +50,7 @@ pub fn crypto_qty(raw: u64) -> Qty {
 }
 
 /// Mixed-scale notional guard: prices/quantities of different scales must
-/// not be multiplied without explicit rescaling — returns None on mismatch
+/// not be multiplied without explicit rescaling - returns None on mismatch
 /// (the precision safety contract).
 pub fn checked_notional_same_scale(p: Price, q: Qty) -> Option<i128> {
     if p.scale + q.scale != CRYPTO_PRICE_SCALE + CRYPTO_QTY_SCALE && p.scale != 4 && p.scale != 8 {
@@ -67,7 +67,7 @@ pub fn checked_notional_same_scale(p: Price, q: Qty) -> Option<i128> {
 // Continuous market mode
 // ---------------------------------------------------------------------------
 
-/// Continuous (24/7) market state — no calendar phases.
+/// Continuous (24/7) market state - no calendar phases.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ContinuousState {
     Running,
@@ -257,18 +257,18 @@ pub struct SettlementBatch {
     pub legs: Vec<SettlementLeg>,
 }
 
-/// Batch evaluation: atomic — valid only when every account/asset balance
+/// Batch evaluation: atomic - valid only when every account/asset balance
 /// can cover its deliver legs.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BatchVerdict {
     Settle,
-    /// Some leg cannot cover — the whole batch rejects (atomicity).
+    /// Some leg cannot cover - the whole batch rejects (atomicity).
     RejectInsufficient,
 }
 
 /// Evaluate a batch against balances (atomicity gate).
 pub fn evaluate_batch(batch: &SettlementBatch, balances: &dyn CustodyAdapter) -> BatchVerdict {
-    // Aggregate per (account, asset) — net within the batch first.
+    // Aggregate per (account, asset) - net within the batch first.
     let mut net: HashMap<(&str, &str), i128> = HashMap::new();
     for leg in &batch.legs {
         *net.entry((leg.account.as_str(), leg.asset.as_str()))
@@ -304,7 +304,7 @@ pub struct WithdrawRequest {
     pub asset: String,
     pub qty: Qty,
     /// Step-up auth token present? (Withdrawals require fresh
-    /// step-up authentication — a normal session is insufficient.)
+    /// step-up authentication - a normal session is insufficient.)
     pub step_up_token: bool,
 }
 
@@ -485,7 +485,7 @@ mod tests {
             qty: crypto_qty(500_000_000),
             tx_ref: "d2".into(),
         });
-        // A delivers 6, receives 2 from B (net −4 ≤ 10) — settle.
+        // A delivers 6, receives 2 from B (net −4 ≤ 10) - settle.
         let ok = SettlementBatch {
             batch_id: 1,
             legs: vec![

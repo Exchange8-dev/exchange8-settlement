@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:Settlement CCP EOD file builders — CDS 3-record layout (
+//! Exchange8:Settlement CCP EOD file builders - CDS 3-record layout (
 //! `Daemon/Feed/CDSFile.cpp` parity) plus the SIS/Fortis record shapes.
 //!
 //! The CDS export is a fixed-width text file: a transmission header, a batch
@@ -306,7 +306,7 @@ fn eod_fill_string(buf: &mut String, value: &str, width: usize) {
 }
 
 fn eod_fill_int(buf: &mut String, value: i64, width: usize) {
-    // sprintf "%0*i" — sign  zero-pad.
+    // sprintf "%0*i" - sign  zero-pad.
     let s = value.abs().to_string();
     let sign = if value < 0 { "-" } else { "" };
     if s.len() + sign.len() >= width {
@@ -320,7 +320,7 @@ fn eod_fill_int(buf: &mut String, value: i64, width: usize) {
 }
 
 fn eod_fill_price(buf: &mut String, value: f64, int_width: usize, decimals: usize) {
-    // : sprintf("%0*.*f", sz1+sz2+1, sz2, value) — total width is
+    // : sprintf("%0*.*f", sz1+sz2+1, sz2, value) - total width is
     // int_width + decimals + 1 (the +1 covers the decimal point); ALL
     // decimals are printed (no trailing-zero trimming).
     let total = int_width + decimals + 1;
@@ -333,7 +333,7 @@ fn eod_fill_price(buf: &mut String, value: f64, int_width: usize, decimals: usiz
     }
 }
 
-/// EOD record widths shared by SIS and Fortis (`SISEndOfDayRecord.h`) —
+/// EOD record widths shared by SIS and Fortis (`SISEndOfDayRecord.h`) -
 /// documentation table (0 = single-char field).
 #[allow(dead_code)]
 const EOD_W: [(usize, &str); 18] = [
@@ -358,7 +358,7 @@ const EOD_W: [(usize, &str); 18] = [
 ];
 
 /// Render one EOD transaction record (SIS/Fortis common fields). Returns the
-/// record bytes WITHOUT the trailing reserved block (caller-specific) —
+/// record bytes WITHOUT the trailing reserved block (caller-specific) -
 /// actually the reserved block is spaces, so include it here per variant.
 fn eod_record_common(t: &EodTransaction, out: &mut String) {
     eod_fill_string(out, &t.account, 30);
@@ -491,7 +491,7 @@ fn _eod_layout_doc() -> [(usize, &'static str); 18] {
 }
 
 // ---------------------------------------------------------------------------
-// Settlement netting CSV (design: clearing doc §4.4 — "settlement netting
+// Settlement netting CSV (design: clearing doc §4.4 - "settlement netting
 // feed", owned by Exchange8:Settlement)
 // ---------------------------------------------------------------------------
 
@@ -821,7 +821,7 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // SIS / Fortis EOD builders — pinned to SISEndOfDayFile.h /
+    // SIS / Fortis EOD builders - pinned to SISEndOfDayFile.h /
     // FortisEndOfDayFile.h struct widths + the .cpp fill order.
     // ------------------------------------------------------------------
 
@@ -930,7 +930,7 @@ mod tests {
         f.add_transaction(sample_eod_transaction());
         let content = f.render();
         let rec = content.lines().next().unwrap().as_bytes();
-        // Fortis: common fields + reserved[38] + '#' — no settlmntTyp.
+        // Fortis: common fields + reserved[38] + '#' - no settlmntTyp.
         assert_eq!(
             rec.len(),
             30 + 3

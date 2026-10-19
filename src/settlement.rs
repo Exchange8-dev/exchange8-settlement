@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:Settlement core — novation, collateral, give-up allocation.
+//! Exchange8:Settlement core - novation, collateral, give-up allocation.
 //!
 //! Pure settlement logic; the shell wires the custody adapter trait, CCP
 //! sessions, and persistence.
@@ -27,7 +27,7 @@ pub struct TradeLeg {
     pub instrument_id: u32,
 }
 
-/// A novated trade — the CCP becomes counterparty to both original sides.
+/// A novated trade - the CCP becomes counterparty to both original sides.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NovatedTrade {
     pub trade_id: u64,
@@ -41,7 +41,7 @@ pub struct NovatedTrade {
     pub novation_seq: u64,
 }
 
-/// Novation engine — idempotent per trade_id (services/settlement/DESIGN.md §6).
+/// Novation engine - idempotent per trade_id (services/settlement/DESIGN.md §6).
 pub struct NovationEngine {
     novated: std::collections::HashSet<u64>,
     next_seq: u64,
@@ -212,7 +212,7 @@ pub struct GiveUpAllocation {
     pub accepted: bool,
 }
 
-/// Give-up allocator — validates and allocates give-up trades.
+/// Give-up allocator - validates and allocates give-up trades.
 pub struct GiveUpAllocator {
     /// Clearing brokers that accept give-ups from this exec broker.
     pub approved_pairs: std::collections::HashSet<(u16, u16)>,

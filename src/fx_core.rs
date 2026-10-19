@@ -3,14 +3,14 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Exchange8:Settlement
 // SPDX-License-Identifier: Apache-2.0
 
-//! Exchange8:Settlement FX core — currency exposure, spot settlement
+//! Exchange8:Settlement FX core - currency exposure, spot settlement
 //! rails, forwards + NDF settlement.
 //!
 //! - **Currency exposure**: per-currency net positions aggregated
 //!   across pairs (buy base = +base/−quote; sell the reverse), with
 //!   limits and **value-date buckets** for forwards.
 //! - **Spot rails**: a dealt FX trade produces two Bank8:Ledger
-//!   posting legs (T+0/1/2 by pair convention) — novated: each client
+//!   posting legs (T+0/1/2 by pair convention) - novated: each client
 //!   settles against the venue, not bilaterally.
 //! - **Forwards + NDF**: forwards settle at value date via
 //!   the futures expiry engine shape (fix-average → cash P&L); NDFs net
@@ -220,7 +220,7 @@ pub struct SettlementLegOut {
     pub value_date_days: u32,
 }
 
-/// Produce the client's settlement legs for one dealt spot trade —
+/// Produce the client's settlement legs for one dealt spot trade -
 /// **novated**: the client settles against the venue on both legs (the
 /// venue's offsetting legs with the LP/cover are separate ledger flows).
 pub fn spot_settlement_legs(
@@ -411,7 +411,7 @@ mod tests {
         let d1 = deal_buy_1m_usdcad();
         assert_eq!(ex.check("USD", "CAD", &d1), ExposureVerdict::Ok);
         ex.apply("USD", "CAD", &d1);
-        // Another 1.5M breaches the same (spot) bucket first: 2.5M > 2M —
+        // Another 1.5M breaches the same (spot) bucket first: 2.5M > 2M -
         // bucket checks fire before total, and both would be exceeded here.
         let d2 = FxDeal {
             base_qty: 1_500_000.0,
@@ -434,7 +434,7 @@ mod tests {
     fn exposure_bucket_limit_independent_of_total() {
         let mut ex = CurrencyExposure::new();
         // Total limit 3M but each value-date bucket capped at 2M via the
-        // same limit — a 1.5M forward on an empty bucket passes.
+        // same limit - a 1.5M forward on an empty bucket passes.
         ex.set_limit("USD", Some(3_000_000.0));
         let fwd = FxDeal {
             base_qty: 1_500_000.0,

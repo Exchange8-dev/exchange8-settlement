@@ -1,4 +1,4 @@
-# Exchange8:Settlement — Business Requirements & DVP settlement, custody, FX, crypto, options
+# Exchange8:Settlement - Business Requirements & DVP settlement, custody, FX, crypto, options
 
 > Audience: product owners, business analysts, and anyone evaluating what
 > Exchange8:Settlement **does for the business**. For architecture read `README.md`;
@@ -10,7 +10,7 @@
   the central counterparty (CCP) steps in as buyer to every seller and seller
   to every buyer, through **novation**, in real time per trade.
 - **Deliver versus payment (DVP)** discipline: no security moves without the
-  matching cash (or crypto) movement, and no batch partially settles — a
+  matching cash (or crypto) movement, and no batch partially settles - a
   settlement either completes atomically or is rejected.
 - Connect the platform to the **outside world of settlement**: CCP end-of-day
   file interfaces (CDS, SIS, Fortis), a crypto **custody** integration for
@@ -23,7 +23,7 @@
   concentration caps, and flag utilization for the margin process.
 - **Convert currencies**: FX deals produce precisely two settlement legs
   (spot, T+0/T+1/T+2), forwards settle at value date, NDFs net to a single
-  quote-currency cash amount — under per-currency and per-value-date
+  quote-currency cash amount - under per-currency and per-value-date
   exposure limits.
 - **Exercise options correctly**: in-the-money longs auto-exercise at expiry,
   short holders are assigned transparently (pro-rata or random), and the
@@ -71,7 +71,7 @@
 | Capability | Business rule |
 |---|---|
 | CCP substitution | Both original counterparties are replaced by the CCP; the original trade is never altered |
-| Idempotency | The same trade is never novated twice — a duplicate delivery returns the original result |
+| Idempotency | The same trade is never novated twice - a duplicate delivery returns the original result |
 | Sequencing | Novations receive a dense sequence number per session, enabling gap detection on reconciliation |
 | CCP outage tolerance | Trades recorded while the CCP is unavailable queue and novate automatically on recovery, oldest first |
 | Per-facility routing | Each security clears at the CCP facility configured for it, with per-facility export credentials held as secret references |
@@ -80,7 +80,7 @@
 
 | Capability | Business rule |
 |---|---|
-| Custody accounts | One custody account per (env, asset, address); private keys are never stored — only secret references |
+| Custody accounts | One custody account per (env, asset, address); private keys are never stored - only secret references |
 | Movement lifecycle | Every on-chain transaction moves through pending → signed → broadcast → confirmed (or failed); stuck transactions are surfaced for operations |
 | Withdrawal approval | Withdrawals always require fresh step-up authentication, respect a per-asset minimum and a 24-hour notional cap |
 | Movement idempotency | A retried deposit/withdrawal (same transaction reference) can never move funds twice |
@@ -95,15 +95,15 @@
 | CDS export | One 3-record group per trade inside a transmission/batch envelope; the file is the fixed-width format the CCP's reader expects, verified byte-for-byte |
 | SIS / Fortis exports | Same common record core, per-variant reserved blocks and named files (`VER1.ISIN.P.<date>.0001.part`, `<date>.emcf`) |
 | Netting | Buys and sells per participant per security net to one quantity and one amount; a fully flat position still appears (with zeros) |
-| Reconciliation posture | The EOD files are the reconciliation backstop — real-time novation remains the primary settlement mechanism |
+| Reconciliation posture | The EOD files are the reconciliation backstop - real-time novation remains the primary settlement mechanism |
 
 ### FX (conversion core)
 
 | Capability | Business rule |
 |---|---|
 | Exposure tracking | Every FX deal shifts signed base/quote currency positions, bucketed by value date |
-| Exposure limits | Per-currency limits apply both per value-date bucket and to the currency total; a deal that breaches either is refused pre-trade (limits are strict — exactly at-limit is allowed) |
-| Spot settlement | A dealt spot trade produces exactly two legs (receive base / deliver quote or the reverse) at the pair's T+0/T+1/T+2 convention, each against the venue — never bilateral |
+| Exposure limits | Per-currency limits apply both per value-date bucket and to the currency total; a deal that breaches either is refused pre-trade (limits are strict - exactly at-limit is allowed) |
+| Spot settlement | A dealt spot trade produces exactly two legs (receive base / deliver quote or the reverse) at the pair's T+0/T+1/T+2 convention, each against the venue - never bilateral |
 | FX swap roll | Rolling produces a far-leg forward at near rate + forward points with the opposite side |
 | Forward settlement | Deliverable forwards settle both currency legs fully at the contract rate on value date |
 | NDF settlement | Non-deliverable forwards settle one quote-currency net: (fix − contract rate) × quantity; the client receives when the fix exceeds the contract rate |
@@ -113,7 +113,7 @@
 | Capability | Business rule |
 |---|---|
 | Precision | Crypto prices and quantities carry 8-decimal scale; mixed-scale multiplication is refused rather than approximated |
-| Continuous market | The 24/7 market supports operational halt/resume only — no calendar phases |
+| Continuous market | The 24/7 market supports operational halt/resume only - no calendar phases |
 | Atomic settlement | A multi-leg settlement batch executes entirely or not at all; intra-batch offsetting needs no external funds |
 | Custody abstraction | Any custodian integration implements the same movement/balance contract with credentials by secret reference |
 
@@ -124,7 +124,7 @@
 | Exercise styles | European options exercise only at expiry; American options may exercise early, capped by their long position |
 | ITM determination | Intrinsic value per contract (call: underlying − strike; put: strike − underlying; floor zero) |
 | Auto-exercise threshold | At expiry only longs with intrinsic value at or above the configurable threshold exercise; OTM legs expire worthless |
-| Assignment | Exercised contracts are allocated across short holders pro-rata (largest-remainder) or by weighted random draw — never exceeding any holder's short |
+| Assignment | Exercised contracts are allocated across short holders pro-rata (largest-remainder) or by weighted random draw - never exceeding any holder's short |
 | Cash settlement | Cash-settled contracts pay intrinsic value × quantity on exercise |
 | Physical settlement | Physically settled contracts convert net positions into underlying delivery obligations (long call receives, short call delivers; puts reversed); OTM legs deliver nothing |
 | Contract expiry | After settlement the contract is terminal: positions are cleared and the outcome is audit-logged |
@@ -151,15 +151,15 @@
 
 ## 5. Business Rules & Invariants
 
-1. Every trade novates exactly once — duplicate deliveries return the
+1. Every trade novates exactly once - duplicate deliveries return the
    original novation and never consume a new sequence number.
 2. A settlement state change and its durable event record are committed
    together: the platform can always reconstruct what happened and what
    must be told to the bus.
 3. Custody funds never move on a repeated transaction reference; an
    insufficient-funds attempt does not "burn" the reference.
-4. Withdrawals require fresh step-up authentication — a normal session is
-   never sufficient — and respect the per-asset minimum and rolling 24-hour
+4. Withdrawals require fresh step-up authentication - a normal session is
+   never sufficient - and respect the per-asset minimum and rolling 24-hour
    notional cap.
 5. A multi-leg settlement batch is atomic: any single under-covered
    delivery leg rejects the whole batch.
@@ -168,7 +168,7 @@
 7. FX exposure limits are checked before a deal commits, against both the
    value-date bucket and the currency total; a deal is refused on either
    breach.
-8. NDFs are never delivered — exactly one quote-currency cash amount
+8. NDFs are never delivered - exactly one quote-currency cash amount
    settles them.
 9. Options auto-exercise only in-the-money longs beyond the configured
    threshold; assignment never exceeds a short holder's open quantity and
@@ -231,7 +231,7 @@
 | Sentin8:Bus | Durable, audited event delivery (outbox producer pattern) |
 | Sentin8:Auth | Identity, M2M client credentials (certificate-bound), step-up token verification |
 | Sentin8:Sys | Audit intake (`POST /v1/audit`) and instance resolution |
-| Bank8/other verticals | None directly — fiat movement is always mediated through Bank8:Ledger |
+| Bank8/other verticals | None directly - fiat movement is always mediated through Bank8:Ledger |
 
 ## 9. Acceptance Criteria
 
