@@ -18,8 +18,8 @@
 mod ccp_files;
 mod crypto_ext;
 mod fx_core;
-mod options;
 mod openapi;
+mod options;
 mod registration;
 mod settlement;
 
