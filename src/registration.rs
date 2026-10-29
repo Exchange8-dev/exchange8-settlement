@@ -166,7 +166,7 @@ const ADMIN_UI_PAGES: &[AdminUiPage] = &[
 ///   consumer + stat emitter pair.
 /// - `settlement-audit` - shell audit-journal pusher workload (§6.8; boot 8c).
 /// - `exchange8-settlement-tls` - database-free HostContextResolver resolve workload
-///   (TLS-RLS-4: `GET /v1/resolve/hostname`, scope
+/// (`GET /v1/resolve/hostname`, scope
 ///   `sentin8:sys:instances:read`).
 const M2M_GRANTS: &[M2mGrant] = &[
     M2mGrant {
