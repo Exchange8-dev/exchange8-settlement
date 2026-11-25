@@ -6,7 +6,8 @@
       "telemetry_property": {
         "slug": "settlement",
         "name": "Exchange8:Settlement Telemetry"
-      }
+      },
+      "exposure": "internal"
     }
   ]
 }
